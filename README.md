@@ -16,7 +16,7 @@ The rule is multiplied by the ones digit of the dividend and the product is adde
 Examples: 
 
           div (826, 7): 826 --> 82 + (-2 * 6) = 70 = 10 * 7, therefore 826 is divisible by 7.
-          div (19151, 11): 19151 --> 1915 + (-1 * 1) = 1914 --> 191 + (-1 * 4) = 187 --> 18 + (-1 * 7)                                                    = 11 = 1 * 11, therefore 19151 is divisible by 11.
+          div (19151, 11): 19151 --> 1915 + (-1 * 1) = 1914 --> 191 + (-1 * 4) = 187 --> 18 + (-1 * 7) = 11 = 1 * 11, therefore 19151 is divisible by 11.
           div (50661,13): 50661 --> 5066 + (4 * 1) = 5070 --> 507 + (4 * 0) = 507 --> 50 + (4 * 7) = 78                                                  = 6 * 13, therefore 50661 is divisible by 13.
        
 One can easily see this algorithm is necessarily O(n) and pairs nicely with a linked list implementation, where we can pop digits in constant time. The program incorporates elementary arithmetic functions and specialized multiplication functions for different contexts. To save runtime cost from clearing digits, a number that becomes 0 after an operation is marked with a 0 in the most significant digit.
