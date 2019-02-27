@@ -26,7 +26,7 @@ To run the driver program:
           >>> g++ bigint.h bigint.cpp main.cpp
           >>> ./a.out <dividend size in digits> <divisor>
 
-The divisor input can be 2, 3, 5, or any number ending in a 1, 3, 7, or 9. This is to accomodate use of "probably prime" numbers" - i.e. prime numbers only end in 1, 3, 7, or 9, so computing divisibility by numbers ending in 5 is trivial when determining primality.
+The divisor input can be 2, 5, or any number greater than 5 ending in a 1, 3, 7, or 9. This is to accomodate use of "probably prime" numbers" - i.e. prime numbers only end in 1, 3, 7, or 9, so computing divisibility by numbers ending in 5 is trivial when determining primality.
           
 The program will generate a random dividend of the first argument, then multiply it by the second argument. It then will print the dividend (which is pretty cool to see when you input a 1,000,000+ digit number), then run the divisibility operator on the two numbers and print the return value. We know the operator is working when it returns a value of 1, divisible, as expected.
 The last output is the runtime in milliseconds for the computation.
