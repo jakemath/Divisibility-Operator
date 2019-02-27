@@ -19,8 +19,8 @@ One can easily see this algorithm is necessarily O(n) and pairs nicely with a li
 
 To run the driver program:
 
-          g++ bigint.h bigint.cpp main.cpp
-          ./a.out <dividend size in digits> <divisor>
+          >>> g++ bigint.h bigint.cpp main.cpp
+          >>> ./a.out <dividend size in digits> <divisor>
 
 The <divisor> input can be 2, 3, 5, or any number ending in a 1, 3, 7, or 9. This is to accomodate use of "probably prime" numbers" - i.e. prime numbers only end in 1, 3, 7, or 9, so computing divisibility by numbers ending in 5 is trivial when determining primality.
           
