@@ -18,8 +18,9 @@ Examples: div (826, 7): 826 --> 82 + (-2 * 6) = 70 = 10 * 7, therefore 826 is di
 One can easily see this algorithm is necessarily O(n) and pairs nicely with a linked list implementation, where we can pop digits in constant time. The program incorporates elementary arithmetic functions and specialized multiplication functions for different contexts. To save runtime cost from clearing digits, a number that becomes 0 after an operation is marked with a 0 in the most significant digit.
 
 To run the driver program:
->>> g++ bigint.h bigint.cpp main.cpp
->>> ./a.out <dividend size in digits> <divisor>
+
+          g++ bigint.h bigint.cpp main.cpp
+          ./a.out <dividend size in digits> <divisor>
 
 The <divisor> input can be 2, 3, 5, or any number ending in a 1, 3, 7, or 9. This is to accomodate use of "probably prime" numbers" - i.e. prime numbers only end in 1, 3, 7, or 9, so computing divisibility by numbers ending in 5 is trivial when determining primality.
           
