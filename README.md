@@ -7,8 +7,8 @@ Numbers are represented digit-wise in reverse order in a linked list to enable a
 Examples: 
 
           7 --> 21 --> rule = -2
-          13 --> 39 --> rule = 4
           11 --> rule = -1
+          13 --> 39 --> rule = 4
           19 --> rule = 2
 
 The rule is multiplied by the ones digit of the dividend and the product is added to the dividend with its ones digit truncated.This process can be iterated until the dividend becomes small enough to clearly recognize divisibility. If the dividend is transformed to an obvious multiple of the divisor or 0, then the dividend is divisible by the divisor. Otherwise, it is not. 
