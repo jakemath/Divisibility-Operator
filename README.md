@@ -1,4 +1,4 @@
-# Divisibility-Operator
+# Divisibility Operator
 
 An implementation and driver program for a O(n) divisibility operator inspired by General Divisibility Criteria (https://arxiv.org/pdf/1401.5486.pdf). The operator computes divisibility of arbitrarily large positive integers by other large positive (mostly odd) integers.
 
