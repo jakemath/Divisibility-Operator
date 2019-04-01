@@ -20,7 +20,7 @@ bigint::bigint (unsigned long long size, bool random)    // Random number constr
     if (random) // Random number specified
     {
         srand(time(0)); // First seed for first half of number
-        for (; i <= size/2; ++i)
+        for (; i <= size / 2; ++i)
             data.push_back(rand() % 10);
         srand(time(0)); // Second seed for second half of number
         for (; i <= size; ++i)
@@ -287,7 +287,7 @@ void rule_multiply (bigint& product, const bigint& rule, short k)   // Specializ
             for (; j != k;)
             {
                 product.data.pop_back();
-                k = std::next (product.data.end(), -1);
+                k = std::next(product.data.end(), -1);
             }
         }
         else if (i != rule.data.end() && j == product.data.end())
