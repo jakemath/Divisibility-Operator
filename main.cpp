@@ -28,3 +28,4 @@ int main (int argc, char* argv[])
     cout << "Runtime: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - start).count();
     cout << " ms" << endl << endl;
 }
+
