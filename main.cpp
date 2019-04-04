@@ -8,9 +8,10 @@
 
 int main (int argc, char* argv[])
 {
-    unsigned long long digits = atoi(argv[1]);
-    string num = argv[2];
-    bigint a(digits,1), b(num);
+    unsigned long long digits1 = atoi(argv[1]), digits2 = atoi(argv[2]);
+    bigint a(digits1,1), b(digits2,1);
+    if (b.get_data().front() % 2 == 0 || b.get_data().front() == 0 || b.get_data().front() == 5)
+        b.get_data().front() = 1;
     if (b.get_data().front() % 2 == 0 || (b.get_data().front() == 5 && b.get_data().size() > 1))
     {
         cout << "Only ddd divisors not ending in 5 allowed." << endl;
