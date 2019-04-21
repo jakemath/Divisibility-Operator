@@ -20,11 +20,20 @@ bigint::bigint (unsigned long long size, bool random)    // Random number constr
     if (random) // Random number specified
     {
         srand(time(0)); // First seed for first half of number
-        for (; i <= size / 2; ++i)
-            data.push_back(rand() % 10);
-        srand(time(0)); // Second seed for second half of number
-        for (; i <= size; ++i)
-            data.push_back(rand() % 10);
+        if (size == 1)
+        {
+            ++size;
+            for (; i <= size/2; ++i)
+                data.push_back(rand() % 10);
+        }
+        else
+        {
+            for (; i <= size/2; ++i)
+                data.push_back(rand() % 10);
+            srand(time(0)); // Second seed for second half of number
+            for (; i <= size; ++i)
+                data.push_back(rand() % 10);
+        }
         if (data.back() == 0)   // Ensure most significant digit is not 0
         {
             for (; data.back() == 0;)
@@ -287,7 +296,7 @@ void rule_multiply (bigint& product, const bigint& rule, short k)   // Specializ
             for (; j != k;)
             {
                 product.data.pop_back();
-                k = std::next(product.data.end(), -1);
+                k = std::next (product.data.end(), -1);
             }
         }
         else if (i != rule.data.end() && j == product.data.end())
@@ -379,7 +388,7 @@ bool bigint::operator == (const bigint& b) const
     return true;
 }
 
-bool div (bigint b1, bigint b2)   // Div operator
+bool div (bigint& b1, bigint& b2)   // Div operator
 {
     if (b2.data.size() == 1 && b2.data.back() != 7 && b2.data.back() != 9)    // Special cases: 2, 3, and 5
     {
@@ -415,7 +424,12 @@ bool div (bigint b1, bigint b2)   // Div operator
         multiples.insert(b2 * 3);
         if (rule.data.empty())
             rule = *multiples.rbegin();
-        for (int i = 4; i <= 27; ++i)   // Compute and store multiples
+        short k;
+        if (b2.data.size() < 100)   // If smaller divisor --> compute more multiples
+            k = 27;
+        else
+            k = 10;
+        for (int i = 4; i <= k; ++i)   // Compute and store multiples
             multiples.insert(b2 * i);
         // Compute rule of b2, and create a 0-filled bigint product to store the results of (rule * ones digit) at each iteration
         if (rule.data.front() == 1)
@@ -425,31 +439,26 @@ bool div (bigint b1, bigint b2)   // Div operator
         }
         else
         {
-            rule.data.pop_front();
+            if (rule.data.size() > 1)
+                rule.data.pop_front();
             ++rule;
         }
-        bigint product(rule.data.size() - 1, 0);
+        bigint product(rule.data.size() - 1, 0);    // Bigint to store result of multiplication each iteration
         short ones; // Variable for ones digit
-        if (rule.negative())
+        void (*arithmetic_operation)(bigint&, bigint&);
+        if (rule.negative())    // If negative valued rule --> negate the rule and use subtraction
         {
             rule.negate();
-            for (; b1 > *multiples.rbegin();)  // Iterate until within bounds of the set
-            {
-                ones = b1.data.front();
-                b1.data.pop_front();
-                rule_multiply(product, rule, ones); // product = rule * ones
-                b1 - product;   // b1 = b1 - product = b1 - (rule * ones)
-            }
+            arithmetic_operation = operator -;
         }
-        else
+        else    // If positive valued rule --> use addition
+            arithmetic_operation = operator +;
+        for (; b1 > *multiples.rbegin();)  // Iterate until within bounds of the set
         {
-            for (; b1 > *multiples.rbegin();)  // Iterate until within bounds of the set
-            {
-                ones = b1.data.front();
-                b1.data.pop_front();
-                rule_multiply(product, rule, ones); // product = rule * ones
-                b1 + product;   // b1 = b1 + product = b1 + (rule * ones)
-            }
+            ones = b1.data.front();
+            b1.data.pop_front();
+            rule_multiply(product, rule, ones); // product = rule * ones
+            arithmetic_operation(b1, product);   // b1 = b1 + product = b1 + (rule * ones)
         }
         if (multiples.find(b1) != multiples.end() || b1.data.back() == 0) // If in the set --> is divisible
             return true;
