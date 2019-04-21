@@ -48,7 +48,7 @@ public:
     friend bigint operator * (const bigint& b1, const bigint& b2); // for different contexts
     friend void rule_multiply (bigint& product, const bigint& rule, short k);
     
-    friend bool div (bigint b1, bigint b2); // Div operator
+    friend bool div (bigint& b1, bigint& b2); // Div operator
     
 private:
     list<short> data;  // Digits stored in reverse order in list
