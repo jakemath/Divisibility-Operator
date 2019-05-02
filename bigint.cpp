@@ -91,23 +91,25 @@ void operator + (bigint& sum, bigint& b)  // Overloaded addition. Result stored 
                     }
                 }
             }
-            else if (i == sum.data.end() && j != b.data.end())  // If sum has less digits than b --> push_back
-            {                                                   // the rest of the results
-                for (; j != b.data.end(); ++j)
-                {
-                    temp = *j + carry;
-                    if (temp > 9)
-                    {
-                        sum.data.push_back(temp - 10);
-                        carry = 1;
-                    }
-                    else
-                    {
-                        sum.data.push_back(temp);
-                        carry = 0;
-                    }
-                }
-            }
+            /*
+             else if (i == sum.data.end() && j != b.data.end())  // If sum has less digits than b --> push_back
+             {                                                   // the rest of the results
+             for (; j != b.data.end(); ++j)
+             {
+             temp = *j + carry;
+             if (temp > 9)
+             {
+             sum.data.push_back(temp - 10);
+             carry = 1;
+             }
+             else
+             {
+             sum.data.push_back(temp);
+             carry = 0;
+             }
+             }
+             }
+             */
             if (carry != 0) // If carry exists after computing each digit --> add a new digit of 1
                 sum.data.push_back(carry);
         }
@@ -323,7 +325,7 @@ void rule_multiply (bigint& product, const bigint& rule, short k)   // Specializ
     }
 }
 
-bool bigint::operator < (const bigint& b) const // Comparison operators
+bool bigint::operator < (const bigint& b) const // < only used for positive comparison in subtraction
 {
     if (data.size() != b.data.size())
     {
@@ -346,17 +348,19 @@ bool bigint::operator < (const bigint& b) const // Comparison operators
     return false;
 }
 
-bool bigint::operator > (const bigint& b) const
+bool bigint::operator > (const bigint& b) const // > only used to compare to a positive number in div loop
 {
-    if (data.size() != b.data.size())
-    {
-        if (data.size() < b.data.size())
-            return false;
-        return true;
-    }
+    if (data.back() == 0)
+        return false;
     if (negative() != b.negative())
     {
         if (negative() && !b.negative())
+            return false;
+        return true;
+    }
+    if (data.size() != b.data.size())
+    {
+        if (data.size() < b.data.size())
             return false;
         return true;
     }
@@ -417,20 +421,9 @@ bool div (bigint& b1, bigint& b2)   // Div operator
         bigint rule;
         if (b2.data.front() == 1 || b2.data.front() == 9)
             rule = b2;
-        std::set<bigint> multiples; // Set to store first 27 multiples of b2
-        multiples.insert(bigint("0"));
-        multiples.insert(b2);
-        multiples.insert(b2 * 2);
-        multiples.insert(b2 * 3);
-        if (rule.data.empty())
-            rule = *multiples.rbegin();
-        short k;
-        if (b2.data.size() < 100)   // If smaller divisor --> compute more multiples
-            k = 27;
         else
-            k = 10;
-        for (int i = 4; i <= k; ++i)   // Compute and store multiples
-            multiples.insert(b2 * i);
+            rule = b2 * 3;
+        bigint twentieth_multiple = b2 * 20; // Set threshold size for iterations
         // Compute rule of b2, and create a 0-filled bigint product to store the results of (rule * ones digit) at each iteration
         if (rule.data.front() == 1)
         {
@@ -443,25 +436,30 @@ bool div (bigint& b1, bigint& b2)   // Div operator
                 rule.data.pop_front();
             ++rule;
         }
-        bigint product(rule.data.size() - 1, 0);    // Bigint to store result of multiplication each iteration
+        bigint product(rule.data.size() - 1, 0);
         short ones; // Variable for ones digit
-        void (*arithmetic_operation)(bigint&, bigint&);
-        if (rule.negative())    // If negative valued rule --> negate the rule and use subtraction
+        void (*arith)(bigint&, bigint&);
+        if (rule.negative())
         {
             rule.negate();
-            arithmetic_operation = operator -;
+            arith = operator -;
         }
-        else    // If positive valued rule --> use addition
-            arithmetic_operation = operator +;
-        for (; b1 > *multiples.rbegin();)  // Iterate until within bounds of the set
+        else
+            arith = operator +;
+        for (; b1 > times_twenty;)  // Iterate until within bounds of the set
         {
             ones = b1.data.front();
             b1.data.pop_front();
             rule_multiply(product, rule, ones); // product = rule * ones
-            arithmetic_operation(b1, product);   // b1 = b1 + product = b1 + (rule * ones)
+            arith(b1, product);   // b1 = b1.chopped() + product or b1 = b1.chopped() - product
         }
-        if (multiples.find(b1) != multiples.end() || b1.data.back() == 0) // If in the set --> is divisible
+        if (b1.data.back() == 0 || b1 == b2 || b1 == times_twenty) // If in the set --> is divisible
             return true;
+        for (int i = 2; i < 20; ++i)
+        {
+            if (b2 * i == b1)
+                return true;
+        }
     }
     return false;
 }
