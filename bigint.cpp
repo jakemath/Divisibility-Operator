@@ -91,25 +91,6 @@ void operator + (bigint& sum, bigint& b)  // Overloaded addition. Result stored 
                     }
                 }
             }
-            /*
-             else if (i == sum.data.end() && j != b.data.end())  // If sum has less digits than b --> push_back
-             {                                                   // the rest of the results
-             for (; j != b.data.end(); ++j)
-             {
-             temp = *j + carry;
-             if (temp > 9)
-             {
-             sum.data.push_back(temp - 10);
-             carry = 1;
-             }
-             else
-             {
-             sum.data.push_back(temp);
-             carry = 0;
-             }
-             }
-             }
-             */
             if (carry != 0) // If carry exists after computing each digit --> add a new digit of 1
                 sum.data.push_back(carry);
         }
@@ -391,6 +372,12 @@ bool bigint::operator == (const bigint& b) const
     }
     return true;
 }
+void compute_multiples (const bigint& b2, std::set<bigint>& multiples)
+{
+    multiples.insert(b2);
+    for (short i = 2; i < 20; ++i)
+        multiples.insert(b2 * i);
+}
 
 bool div (bigint& b1, bigint& b2)   // Div operator
 {
@@ -423,7 +410,10 @@ bool div (bigint& b1, bigint& b2)   // Div operator
             rule = b2;
         else
             rule = b2 * 3;
-        bigint twentieth_multiple = b2 * 20; // Set threshold size for iterations
+        std::set<bigint> multiples;
+        multiples.insert(b2);
+        multiples.insert(threshold);
+        std::thread t(std::ref(compute_multiples), std::ref(b2), std::ref(multiples));
         // Compute rule of b2, and create a 0-filled bigint product to store the results of (rule * ones digit) at each iteration
         if (rule.data.front() == 1)
         {
@@ -446,20 +436,18 @@ bool div (bigint& b1, bigint& b2)   // Div operator
         }
         else
             arith = operator +;
-        for (; b1 > times_twenty;)  // Iterate until within bounds of the set
+        for (; b1 > *multiples.rbegin();)  // Iterate until within bounds of the set
         {
             ones = b1.data.front();
             b1.data.pop_front();
             rule_multiply(product, rule, ones); // product = rule * ones
             arith(b1, product);   // b1 = b1.chopped() + product or b1 = b1.chopped() - product
         }
-        if (b1.data.back() == 0 || b1 == b2 || b1 == times_twenty) // If in the set --> is divisible
+        t.join();
+        if (b1.negative())
+            return false;
+        if (b1.data.back() == 0 || multiples.find(b1) != multiples.end()) // If in the set --> is divisible
             return true;
-        for (int i = 2; i < 20; ++i)
-        {
-            if (b2 * i == b1)
-                return true;
-        }
     }
     return false;
 }
