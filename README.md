@@ -1,6 +1,6 @@
 # Divisibility Operator
 
-An implementation and driver program for a O(n) divisibility operator inspired by General Divisibility Criteria (https://arxiv.org/pdf/1401.5486.pdf). The operator computes divisibility of arbitrarily large positive integers by other large positive (mostly odd) integers.
+An implementation and driver program for a divisibility operator inspired by General Divisibility Criteria (https://arxiv.org/pdf/1401.5486.pdf). The operator computes divisibility of arbitrarily large positive integers by other arbitrarily large positive (probably prime) integers.
 
 Numbers are represented digit-wise in reverse order in a linked list to enable arithmetic with numbers with an arbitrary amount of digits. The algorithm iteratively reduces the dividend by one digit from the least significant side using number theoretic divisibility rules that can be computed for any odd number ending in 1, 3, 7, or 9. The divisibility rule for a number is computed by finding the first multiple of the number that ends in a 1 or a 9. If it ends in a 1 --> truncate the ones digit and the rule is to subtract the remaining leading truncated number. If it ends in a 9 --> truncate the ones digit, increment the truncated number, and the rule is to add the remaining leading truncated number. Numbers that end in a 1 or 9, therefore, require no further computations for the rule. Numbers that end in 3 or 7 may simply be multiplied by 3 since that multiple will necessarily end in 9 or 1, respectively.
 
@@ -28,6 +28,6 @@ To run the driver program:
 
 The program constructs two random numbers with the number of digits specified for each, multiplies them, then runs
 
-          div(product, divisor)
+          div(dividend, divisor)
 
 through the div operator. The program then prints the two numbers, the return value of the div operator, the digits in the product dividend, the digits in the divisor, and the runtime in milliseconds - we know the operator is working when the return value is 1. If you toy with different inputs you will notice the program runs in linear time for both arguments.
