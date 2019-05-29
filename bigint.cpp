@@ -37,7 +37,7 @@ bigint::bigint (unsigned long long size, bool random)    // Random number constr
         if (data.back() == 0)   // Ensure most significant digit is not 0
         {
             for (; data.back() == 0;)
-                data.back() = rand() % 10;
+                data.back() = (rand() % 10);
         }
     }
     else    // 0-filled specified
@@ -102,7 +102,7 @@ void operator - (bigint& diff, bigint& b)  // Overloaded subtraction. Result sto
     if (b.data.back() != 0) // No execution if subtracting 0
     {
         if (diff < b)   // Negative results defaulted to -1
-            diff.data.back() = -1;
+            diff.negate();
         else if (diff == b) // If same number --> 0
             diff.data.back() = 0;
         else
@@ -152,7 +152,7 @@ void bigint::operator ++()  // Overloaded pre-increment.
     }
 }
 
-bigint operator * (const bigint& b, int k)  // General overloaded multiplication
+bigint operator * (const bigint& b, short k)  // General overloaded multiplication
 {
     if (k == 0 || b.data.back() == 0)   // If multiplying by 0 --> return 0
         return bigint("0");
@@ -275,11 +275,11 @@ void rule_multiply (bigint& product, const bigint& rule, short k)   // Specializ
             }
             else
                 --j;
-            list<short>::iterator k = std::next (product.data.end(), -1);
+            list<short>::iterator k = std::next(product.data.end(), -1);
             for (; j != k;)
             {
                 product.data.pop_back();
-                k = std::next (product.data.end(), -1);
+                k = std::next(product.data.end(), -1);
             }
         }
         else if (i != rule.data.end() && j == product.data.end())
@@ -331,8 +331,6 @@ bool bigint::operator < (const bigint& b) const // < only used for positive comp
 
 bool bigint::operator > (const bigint& b) const // > only used to compare to a positive number in div loop
 {
-    if (data.back() == 0)
-        return false;
     if (negative() != b.negative())
     {
         if (negative() && !b.negative())
@@ -372,15 +370,15 @@ bool bigint::operator == (const bigint& b) const
     }
     return true;
 }
+
 void compute_multiples (const bigint& b2, std::set<bigint>& multiples)
 {
-    multiples.insert(b2);
-    for (short i = 2; i < 20; ++i)
+    for (short i = 2; i <= 9; ++i)
         multiples.insert(b2 * i);
 }
 
-bool div (bigint& b1, bigint& b2)   // Div operator
-{
+bool div (bigint& b1, bigint& b2)   // Div operator. Iteratively reduce b1 to a small enough number to compute
+{                                   // divisibility. b2 divides b1 IFF b2 divides the transformed b1
     if (b2.data.size() == 1 && b2.data.back() != 7 && b2.data.back() != 9)    // Special cases: 2, 3, and 5
     {
         if (b2.data.front() == 2)   // div by 2
@@ -410,10 +408,12 @@ bool div (bigint& b1, bigint& b2)   // Div operator
             rule = b2;
         else
             rule = b2 * 3;
+        bigint threshold = b2; // Set threshold = 10 * b2 as stopping point for iterations
+        threshold.data.push_front(0);
         std::set<bigint> multiples;
         multiples.insert(b2);
         multiples.insert(threshold);
-        std::thread t(std::ref(compute_multiples), std::ref(b2), std::ref(multiples));
+        std::thread t(compute_multiples, std::ref(b2), std::ref(multiples));
         // Compute rule of b2, and create a 0-filled bigint product to store the results of (rule * ones digit) at each iteration
         if (rule.data.front() == 1)
         {
@@ -427,7 +427,7 @@ bool div (bigint& b1, bigint& b2)   // Div operator
             ++rule;
         }
         bigint product(rule.data.size() - 1, 0);
-        short ones; // Variable for ones digit
+        short ones;
         void (*arith)(bigint&, bigint&);
         if (rule.negative())
         {
@@ -436,17 +436,19 @@ bool div (bigint& b1, bigint& b2)   // Div operator
         }
         else
             arith = operator +;
-        for (; b1 > *multiples.rbegin();)  // Iterate until within bounds of the set
+        for (; b1 > threshold;)  // Iterate until within bounds of the set
         {
             ones = b1.data.front();
             b1.data.pop_front();
             rule_multiply(product, rule, ones); // product = rule * ones
             arith(b1, product);   // b1 = b1.chopped() + product or b1 = b1.chopped() - product
         }
-        t.join();
-        if (b1.negative())
+        if (b1.negative())  // If negative --> is not divisible
             return false;
-        if (b1.data.back() == 0 || multiples.find(b1) != multiples.end()) // If in the set --> is divisible
+        if (b1.data.back() == 0)
+            return true;
+        t.join();
+        if (multiples.find(b1) != multiples.end()) // If remainder of 0 or equals b2 --> is divisible
             return true;
     }
     return false;
