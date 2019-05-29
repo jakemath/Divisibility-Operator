@@ -28,6 +28,9 @@ public:
     
     list<short>& get_data() { return data; }   // Reference to data
     
+    bool negative() const { return data.back() < 0; }
+    void negate() { data.back() *= -1; }
+    
     friend std::ostream& operator << (std::ostream& out, const bigint& b);  // Outstream overload
     
     void operator ++(); // Increment
