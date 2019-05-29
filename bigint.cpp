@@ -51,9 +51,9 @@ void operator + (bigint& sum, bigint& b)  // Overloaded addition. Result stored 
 {
     if (b.data.back() != 0) // In this program we mark a number as 0 by making the most significant
     {                       // digit 0. If it is 0 --> no execution
-        if (!(sum.data.back() < 0) && b.data.back() < 0)    // A + (-B) = A - B
+        if (!sum.negative() && b.negative())    // A + (-B) = A - B
         {
-            b.data.back() *= -1;
+            b.negate();
             sum - b;
         }
         else
@@ -102,7 +102,7 @@ void operator - (bigint& diff, bigint& b)  // Overloaded subtraction. Result sto
     if (b.data.back() != 0) // No execution if subtracting 0
     {
         if (diff < b)   // Negative results defaulted to -1
-            diff.data.back() *= -1;
+            diff.negate();
         else if (diff == b) // If same number --> 0
             diff.data.back() = 0;
         else
@@ -187,12 +187,12 @@ bigint operator * (const bigint& b, short k)  // General overloaded multiplicati
     {
         bigint l = b * (k % 10), r = b * (k / 10) * 10;
         r + l;
-        if ((b.data.back() < 0 && k > 0) || (!(b.data.back() < 0) && k < 0))    // Account for differing signs
-            r.data.back() *= -1;
+        if ((b.negative() && k > 0) || (!b.negative() && k < 0))    // Account for differing signs
+            r.negate();
         return r;   // Return local r
     }
-    if ((b.data.back() < 0 && k > 0) || (!(b.data.back() < 0) && k < 0))    // Account for differing signs
-        product.data.back() *= -1;
+    if ((b.negative() && k > 0) || (!b.negative() && k < 0))    // Account for differing signs
+        product.negate();
     return product;
 }
 
@@ -238,8 +238,8 @@ bigint operator * (const bigint& b1, const bigint& b2)    // Bigint multiplicati
         if (carry != 0)
             product.data.push_back(carry);
     }
-    if ((b1.data.back() < 0) != (b2.data.back() < 0))
-        product.data.back() *= -1;
+    if (b1.negative() != b2.negative())
+        product.negate();
     return product;
 }
 
@@ -301,8 +301,8 @@ void rule_multiply (bigint& product, const bigint& rule, short k)   // Specializ
         }
         if (carry != 0)
             product.data.push_back(carry);
-        if (rule.data.back() < 0)
-            product.data.back() *= -1;
+        if (rule.negative())
+            product.negate();
     }
 }
 
@@ -331,9 +331,9 @@ bool bigint::operator < (const bigint& b) const // < only used for positive comp
 
 bool bigint::operator > (const bigint& b) const // > only used to compare to a positive number in div loop
 {
-    if ((data.back() < 0) != (b.data.back() < 0))
+    if (negative() != b.negative())
     {
-        if ((data.back() < 0) && !(b.data.back() < 0))
+        if (negative() && !b.negative())
             return false;
         return true;
     }
@@ -360,7 +360,7 @@ bool bigint::operator > (const bigint& b) const // > only used to compare to a p
 
 bool bigint::operator == (const bigint& b) const
 {
-    if (data.size() != b.data.size() || data.back() != b.data.back() || data.front() != b.data.front() || ((data.back() < 0) != (b.data.back() < 0)))
+    if (data.size() != b.data.size() || data.back() != b.data.back() || data.front() != b.data.front() || negative() != b.negative())
         return false;
     list<short>::const_iterator i = ++b.data.begin(), j = ++data.begin();
     for (; i != b.data.end() && j != data.end(); ++i, ++j)
@@ -418,7 +418,7 @@ bool div (bigint& b1, bigint& b2)   // Div operator. Iteratively reduce b1 to a 
         if (rule.data.front() == 1)
         {
             rule.data.pop_front();
-            rule.data.back() *= -1;
+            rule.negate();
         }
         else
         {
@@ -431,7 +431,7 @@ bool div (bigint& b1, bigint& b2)   // Div operator. Iteratively reduce b1 to a 
         void (*arith)(bigint&, bigint&);
         if (rule.data.back() < 0)
         {
-            rule.data.back() *= -1;
+            rule.negate();
             arith = operator -;
         }
         else
@@ -443,7 +443,7 @@ bool div (bigint& b1, bigint& b2)   // Div operator. Iteratively reduce b1 to a 
             rule_multiply(product, rule, ones); // product = rule * ones
             arith(b1, product);   // b1 = b1.chopped() + product or b1 = b1.chopped() - product
         }
-        if (b1.data.back() < 0)  // If negative --> is not divisible
+        if (b1.negative())  // If negative --> is not divisible
             return false;
         if (b1.data.back() == 0)
             return true;
