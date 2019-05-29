@@ -44,10 +44,10 @@ public:
     friend void operator + (bigint& sum, bigint& b);    // Addition
     friend void operator - (bigint& diff, bigint& b);   // Subtraction
     
-    friend bigint operator * (const bigint& b, int k); // Optimized multiplication functions
+    friend void compute_multiples (const bigint& b2, std::set<bigint>& multiples);
+    friend bigint operator * (const bigint& b, short k); // Optimized multiplication functions
     friend bigint operator * (const bigint& b1, const bigint& b2); // for different contexts
     friend void rule_multiply (bigint& product, const bigint& rule, short k);
-    friend void compute_multiples (const bigint& b2, std::set<bigint>& multiples);
     friend bool div (bigint& b1, bigint& b2); // Div operator
     
 private:
