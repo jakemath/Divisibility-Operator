@@ -26,13 +26,9 @@ public:
     bigint (string num);
     bigint (unsigned long long size, bool random);
     
-    bool negative() const { return (data.back() < 0); } // Negativity
-    
     list<short>& get_data() { return data; }   // Reference to data
     
     friend std::ostream& operator << (std::ostream& out, const bigint& b);  // Outstream overload
-    
-    void negate() { data.back() *= -1; }    // *= -1
     
     void operator ++(); // Increment
     
