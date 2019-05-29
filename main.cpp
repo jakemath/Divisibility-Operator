@@ -45,5 +45,4 @@ int main (int argc, char* argv[])
     cout << "Digits in divisor: " << b.get_data().size() << endl;
     cout << "Runtime: " << std::chrono::duration_cast<std::chrono::milliseconds> (end - start).count();
     cout << " ms" << endl << endl;
-    //cout << k << " " << digits1 << " " << b.get_data().size() << " " << std::chrono::duration_cast<std::chrono::milliseconds> (end - start).count() << endl;
 }
