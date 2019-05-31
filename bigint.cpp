@@ -187,7 +187,8 @@ bigint operator * (const bigint& b, short k)  // General overloaded multiplicati
     }
     else    // k > 10 and not multiple of 10 --> recurse and add (b * ones digit of k) + (b * k / 10)
     {
-        bigint l = b * (k % 10), r = b * (k / 10) * 10;
+        bigint l = b * (k % 10), r = b * (k / 10);
+        r.data.push_front(0);
         r + l;
         if ((b.data.back() < 0 && k > 0) || (b.data.back() > 0 && k < 0))    // Account for differing signs
             r.data.back() *= -1;
@@ -214,7 +215,8 @@ bigint operator * (const bigint& b1, const bigint& b2)    // Bigint multiplicati
         {
             product = b2;
             product.data.pop_front();
-            bigint l = b1 * b2.data.front(), r = (b1 * product) * 10;
+            bigint l = b1 * b2.data.front(), r = b1 * product;
+            r.data.push_front(0);
             r + l;
             return r;
         }
