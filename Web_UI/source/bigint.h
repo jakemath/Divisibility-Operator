@@ -9,8 +9,9 @@
 
 #include <iostream>
 #include <string>
-#include <set>
 #include <thread>
+#include <numeric>
+#include <set>
 #include <list>
 #include <iterator>
 
@@ -45,29 +46,22 @@ public:
     bigint();   // Constructors
     bigint (string num);
     bigint (unsigned long long size, bool random);
-    
     list<short>& get_data() { return data; }   // Reference to data
-    
     friend std::ostream& operator << (std::ostream& out, const bigint& b);  // Outstream overload
-    
     void operator ++(); // Increment
-    
     bool operator < (const bigint& b) const;    // Comparison
     bool operator > (const bigint& b) const;
     bool operator == (const bigint& b) const;
-    
-    void operator = (const bigint& b) { data = b.data; } // Assignment
+    void operator = (const bigint& b) { data = b.data; }    // Assignment
     friend void operator + (bigint& sum, bigint& b);    // Addition
     friend void operator - (bigint& diff, bigint& b);   // Subtraction
-    
+    friend void compute_multiples (const bigint& b2, std::set<bigint>& multiples);
     friend bigint operator * (const bigint& b, short k); // Optimized multiplication functions
     friend bigint operator * (const bigint& b1, const bigint& b2); // for different contexts
-    friend void compute_multiples (const bigint& b2, std::set<bigint>& multiples);
     friend void rule_multiply (bigint& product, const bigint& rule, short k);
-    
-    friend output div (bigint& b1, bigint& b2); // Div operator
-    
+    friend bool div (bigint& b1, bigint& b2); // Div operator
 private:
     list<short> data;  // Digits stored in reverse order in list
 };
+
 #endif /* bigint_h */
