@@ -6,6 +6,8 @@
 
 #include "bigint.h"
 
+using namespace std;
+
 bigint::bigint() {}   // Default constructor
 
 bigint::bigint (string num)    // String constructor
@@ -37,7 +39,7 @@ bigint::bigint (unsigned long long size, bool random)    // Random number constr
         if (data.back() == 0)   // Ensure most significant digit is not 0
         {
             for (; data.back() == 0;)
-                data.back() = (rand() % 10);
+                data.back() = rand() % 10;
         }
     }
     else    // 0-filled specified
@@ -51,7 +53,7 @@ void operator + (bigint& sum, bigint& b)  // Overloaded addition. Result stored 
 {
     if (b.data.back() != 0) // In this program we mark a number as 0 by making the most significant
     {                       // digit 0. If it is 0 --> no execution
-        if (sum.data.back() >= 0 && b.data.back() < 0)    // A + (-B) = A - B
+        if (!(sum.data.back() < 0) && b.data.back() < 0)    // A + (-B) = A - B
         {
             b.data.back() *= -1;
             sum - b;
@@ -101,7 +103,7 @@ void operator - (bigint& diff, bigint& b)  // Overloaded subtraction. Result sto
 {
     if (b.data.back() != 0) // No execution if subtracting 0
     {
-        if (diff < b)   // Negative results defaulted to -1
+        if (diff < b)   // Negative results defaulted to negative
             diff.data.back() *= -1;
         else if (diff == b) // If same number --> 0
             diff.data.back() = 0;
@@ -117,10 +119,13 @@ void operator - (bigint& diff, bigint& b)  // Overloaded subtraction. Result sto
                     list<short>::iterator k = i;   // Iterate from current digit
                     if (*i != 0)    // If current digit non-zero --> ignore
                         ++k;
-                    for (; *k == 0; ++k)    // Switch all 0 digits to 9 until a non-zero digit is found
+                    for (; *k == 0 && k != diff.data.end(); ++k)    // Switch all 0 digits to 9 until a non-zero digit is found
                         *k = 9;
-                    --*k;   // Decrement first non-zero digit to borrow from it
-                    *i = temp + 10; // Add borrow to the current digit
+                    if (k != diff.data.end())
+                    {
+                        --*k;   // Decrement first non-zero digit to borrow from it
+                        *i = temp + 10; // Add borrow to the current digit
+                    }
                 }
                 else    // If positive result --> store temp
                     *i = temp;
@@ -157,13 +162,13 @@ bigint operator * (const bigint& b, short k)  // General overloaded multiplicati
     if (k == 0 || b.data.back() == 0)   // If multiplying by 0 --> return 0
         return bigint("0");
     bigint product; // Store result in product
-    if (k < 10) // If k < 10 --> no recursion
+    if (abs(k) < 10) // If k < 10 --> no recursion
     { // Temp holds result of digit multiplication, carry holds potential overflow from temp
         short temp, carry = 0;
         list<short>::const_iterator i = b.data.begin();
         for (; i != b.data.end(); ++i)
         {
-            temp = (abs(*i) * k) + carry;  // Use abs and worry about negativity after
+            temp = (abs(*i * k)) + carry;  // Use abs and worry about negativity after
             if (temp > 9)   // If temp > 10 --> store ones digit of temp and let carry = temp / 10.
             {               // So if temp = 81 --> result = 1, carry = 8
                 product.data.push_back(temp % 10);
@@ -178,19 +183,17 @@ bigint operator * (const bigint& b, short k)  // General overloaded multiplicati
         if (carry != 0) // push_back any leftover carry after iterating
             product.data.push_back(carry);
     }
-    else if (k % 10 == 0)   // Optimization for multiple of 10
+    else if (abs(k) == 10)   // Optimization for multiple of 10
     {
         product = b;
         product.data.push_front(0);
-        if (k != 10)
-            return product * (k / 10);
     }
     else    // k > 10 and not multiple of 10 --> recurse and add (b * ones digit of k) + (b * k / 10)
     {
         bigint l = b * (k % 10), r = b * (k / 10);
         r.data.push_front(0);
         r + l;
-        if ((b.data.back() < 0 && k > 0) || (b.data.back() > 0 && k < 0))    // Account for differing signs
+        if (b.data.back() < 0 != k < 0)    // Account for differing signs
             r.data.back() *= -1;
         return r;   // Return local r
     }
@@ -258,7 +261,7 @@ void rule_multiply (bigint& product, const bigint& rule, short k)   // Specializ
         list<short>::iterator j = product.data.begin();
         for (; i != rule.data.end() && j != product.data.end(); ++i, ++j)
         {
-            temp = (abs(*i) * k) + carry;
+            temp = (*i * k) + carry;
             if (temp > 9)
             {
                 *j = temp % 10;
@@ -313,15 +316,9 @@ void rule_multiply (bigint& product, const bigint& rule, short k)   // Specializ
 bool bigint::operator < (const bigint& b) const // < only used for positive comparison in subtraction
 {
     if (data.size() != b.data.size())
-    {
-        if (data.size() > b.data.size())
-            return false;
-        return true;
-    }
-    if (data.back() > b.data.back())
-        return false;
-    if (data.back() < b.data.back())
-        return true;
+        return data.size() < b.data.size();
+    if (data.back() != b.data.back())
+        return data.back() < b.data.back();
     list<short>::const_reverse_iterator i = ++data.rbegin(), j = ++b.data.rbegin();
     for (; i != data.rend() && j != b.data.rend(); ++i, ++j)
     {
@@ -335,22 +332,12 @@ bool bigint::operator < (const bigint& b) const // < only used for positive comp
 
 bool bigint::operator > (const bigint& b) const // > only used to compare to a positive number in div loop
 {
-    if (data.back() < 0 != b.data.back() < 0)
-    {
-        if (data.back() < 0 && b.data.back() > 0)
-            return false;
-        return true;
-    }
-    if (data.size() != b.data.size())
-    {
-        if (data.size() < b.data.size())
-            return false;
-        return true;
-    }
-    if (data.back() < b.data.back())
+    if (data.back() <= 0)
         return false;
-    if (data.back() > b.data.back())
-        return true;
+    if (data.size() != b.data.size())
+        return data.size() > b.data.size();
+    if (data.back() != b.data.back())
+        return data.back() > b.data.back();
     list<short>::const_reverse_iterator i = ++data.rbegin(), j = ++b.data.rbegin();
     for (; i != data.rend() && j != b.data.rend(); ++i, ++j)
     {
@@ -366,18 +353,14 @@ bool bigint::operator == (const bigint& b) const
 {
     if (data.size() != b.data.size() || data.back() != b.data.back() || data.front() != b.data.front() || data.back() < 0 != b.data.back() < 0)
         return false;
-    list<short>::const_iterator i = ++b.data.begin(), j = ++data.begin();
-    for (; i != b.data.end() && j != data.end(); ++i, ++j)
-    {
-        if (*i != *j)
-            return false;
-    }
-    return true;
+    list<short>::const_iterator i = ++data.begin(), j = ++b.data.begin();
+    for (; i != b.data.end() && j != b.data.end() && *i == *j; ++i, ++j){}
+    return i == data.end() && j == b.data.end();
 }
 
 void compute_multiples (const bigint& b2, std::set<bigint>& multiples)
 {
-    for (short i = 2; i <= 49; ++i)
+    for (short i = 2; i <= 19; ++i)
         multiples.insert(b2 * i);
 }
 
@@ -386,39 +369,37 @@ bool div (bigint& b1, bigint& b2)   // Div operator. Iteratively reduce b1 to a 
     if (b2.data.size() == 1 && b2.data.back() != 7 && b2.data.back() != 9)    // Special cases: 2, 3, and 5
     {
         if (b2.data.front() == 2)   // div by 2
-        {
-            if (b1.data.front() % 2 == 0)
-                return true;
-            return false;
-        }
+            return b1.data.front() % 2 == 0;
         if (b2.data.front() == 3)   // div by 3
-        {
-            unsigned long long total = 0;
-            list<short>::iterator i = b1.data.begin();
-            for (; i != b1.data.end(); ++i)
-                total += *i;
-            if (total % 3 == 0)
-                return true;
-            return false;
-        }
-        if (b1.data.front() == 0 || b1.data.front() == 5)   // div by 5
+            return std::accumulate(b1.data.begin(), b1.data.end(), 0) % 3 == 0;
+        return b1.data.front() == 0 || b1.data.front() == 5;   // div by 5
+    }
+    if (b1.data.size() == b2.data.size())
+    {
+        if (b1 == b2)
             return true;
+        if (b1 > b2)
+        {
+            for (short i = 2; i <= 9; ++i)
+            {
+                if (b1 == b2 * i)
+                    return true;
+            }
+        }
         return false;
     }
-    else if (b1.data.size() >= b2.data.size())
+    if (b1.data.size() > b2.data.size())
     {
-        bigint rule;
+        bigint rule, threshold = b2 * 2;
+        threshold.data.push_front(0);
         if (b2.data.front() == 1 || b2.data.front() == 9)
             rule = b2;
         else
             rule = b2 * 3;
-        bigint threshold = b2 * 5; // Set threshold = b2 * 50 as stopping point for iterations
-        threshold.data.push_front(0);
         std::set<bigint> multiples;
         multiples.insert(b2);
         multiples.insert(threshold);
         std::thread t(compute_multiples, std::ref(b2), std::ref(multiples));
-        // Compute rule of b2, and create a 0-filled bigint product to store the results of (rule * ones digit) at each iteration
         if (rule.data.front() == 1)
         {
             rule.data.pop_front();
@@ -447,11 +428,11 @@ bool div (bigint& b1, bigint& b2)   // Div operator. Iteratively reduce b1 to a 
             rule_multiply(product, rule, ones); // product = rule * ones
             arith(b1, product);   // b1 = b1.chopped() + product or b1 = b1.chopped() - product
         }
+        t.join();
         if (b1.data.back() < 0)  // If negative --> is not divisible
             return false;
         if (b1.data.back() == 0)    // If 0 --> is divisible
             return true;
-        t.join();   // If > 0 --> finish computing multiples and check if value is in the set
         if (multiples.find(b1) != multiples.end()) // If in the set --> is divisible
             return true;
     }
