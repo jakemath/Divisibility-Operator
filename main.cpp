@@ -1,4 +1,4 @@
-/*
+ /*
  main.cpp
  Created by Jake Mathai on 2/4/2019.
  Copyright © 2019 Jake Mathai. All rights reserved.
@@ -19,9 +19,16 @@ int main (int argc, char* argv[])
         a_size = 1;
     else
         a_size = d - divsr_size;
-    bigint a(a_size, 1), b(divsr_size, 1);
+    bigint a(a_size, 1), b;
+    short odds[4] = {7,9,3,1};
+    if (divsr_size == 1)
+    {
+        srand(time(0));
+        b.get_data().push_back(odds[rand() % 2]);
+    }
+    else
+        b = bigint(divsr_size,1);
     // Check for faulty inputs
-    short odds[4] = {3,7,9,1};
     if (b.get_data().front() % 2 == 0)
     {
         srand(time(0));
@@ -30,7 +37,7 @@ int main (int argc, char* argv[])
         else if (b.get_data().size() == 1 && b.get_data().front() != 2)
             b.get_data().front() = odds[rand() % 3];
     }
-    else if (b.get_data().front() == 5 && b.get_data().size() > 1)
+    if (b.get_data().front() == 5 && b.get_data().size() > 1)
         b.get_data().front() = odds[rand() % 4];
     else if (b.get_data().front() == 1 && b.get_data().size() == 1)     // If divisor is 1
         b.get_data().front() = odds[rand() % 3];
