@@ -25,7 +25,7 @@ To run the driver program:
 
           >>> chmod +x build.sh
           >>> ./build.sh
-          >>> ./a.out <digits in dividend> <digits in divisor>
+          >>> ./a.out <dividend_digits> <divisor_digits>
 
 The program constructs two random numbers with the number of digits specified for each, multiplies them, then runs
 
