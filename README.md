@@ -23,7 +23,8 @@ One can easily see this algorithm is necessarily O(n) and pairs nicely with a li
 
 To run the driver program:
 
-          >>> g++ -std=c++2a bigint.h bigint.cpp main.cpp
+          >>> chmod +x build.sh
+          >>> ./build.sh
           >>> ./a.out <digits in dividend> <digits in divisor>
 
 The program constructs two random numbers with the number of digits specified for each, multiplies them, then runs
