@@ -354,7 +354,7 @@ bool div (bigint& b1, bigint& b2)   // Div operator. Iteratively reduce b1 to a 
         std::set<bigint> multiples;
         multiples.insert(b2);
         multiples.insert(threshold);
-        for (int i = 2; i < 20; ++i)
+        for (int i = 3; i <= 20; ++i)
             multiples.insert(b2 * i);
         if (b2.data.front() == 1 || b2.data.front() == 9)
             rule = b2;
