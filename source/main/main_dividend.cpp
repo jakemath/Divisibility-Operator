@@ -6,8 +6,7 @@
 
 #include "../header/bigint.h"
 
-int main (int argc, char* argv[])
-{
+int main (int argc, char* argv[]) {
     unsigned long long dividend_upper = atoi(argv[1]), dividend_size;
     bigint b(10, true);
     short odds[4] = {7,9,3,1};
@@ -20,7 +19,7 @@ int main (int argc, char* argv[])
     }
     if (b.digits.front() == 5 && b.digits.size() > 1)
         b.digits().front() = odds[rand() % 4];
-    else if (b.digits.front() == 1 && b.digits.size() == 1)     // If divisor is 1
+    else if (b.digits.front() == 1 && b.digits.size() == 1)
         b.digits().front() = odds[rand() % 3];
     for (unsigned long long n = 11; n <= dividend_upper; ++n) {
         bigint a(n - b.digits.size(), true);

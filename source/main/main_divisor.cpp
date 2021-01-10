@@ -1,16 +1,15 @@
- /*
- main.cpp
- Created by Jake Mathai on 2/4/2019.
- Copyright © 2019 Jake Mathai. All rights reserved.
- */
+/*
+main.cpp
+Created by Jake Mathai on 2/4/2019.
+Copyright © 2019 Jake Mathai. All rights reserved.
+*/
 
 #include "../header/bigint.h"
 
-int main (int argc, char* argv[])
-{
-    unsigned long long dividend_size = atoi(argv[1]), m = 2;
+int main (int argc, char* argv[]) {
+    unsigned long long dividend_size = atoi(argv[1]), m ;
     std::default_random_engine generator;
-    for (; m <= dividend_size; ++m) {
+    for (m = 2; m <= dividend_size; ++m) {
         bigint b(m, true);
         short odds[4] = {7,9,3,1};
         if (b.digits.front() % 2 == 0) {

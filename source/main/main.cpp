@@ -6,8 +6,7 @@
 
 #include "../header/bigint.h"
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     unsigned long long dividend_size = atoi(argv[1]), divisor_size = atoi(argv[2]);
     cout << "Generating operands..." << endl << endl;
     if (dividend_size < divisor_size) {
@@ -26,7 +25,6 @@ int main(int argc, char* argv[])
     }
     else
         b = bigint(divisor_size, 1);
-    // Check for faulty inputs
     if (b.digits.front() % 2 == 0) {
         srand(time(0));
         if (b.digits.size() > 1)
@@ -45,7 +43,7 @@ int main(int argc, char* argv[])
     auto start = std::chrono::steady_clock::now();
     divisible = div(a,b);
     auto end = std::chrono::steady_clock::now();
-    cout << "A | B = " << (divisible ? "True" : "False") << "\nDIVIDEND SIZE = " << dividend_size;
-    cout << "\nDIVISOR SIZE = " << b.digits.size() << "\nRUNTIME = ";
-    cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << endl;
+    cout << "A | B = " << (divisible ? "True" : "False") << "\nDIVIDEND SIZE = " << dividend_size
+         << "\nDIVISOR SIZE = " << b.digits.size() << "\nRUNTIME = "
+         << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << endl;
 }
