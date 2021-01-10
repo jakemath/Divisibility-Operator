@@ -40,28 +40,28 @@ void operator + (bigint& sum, bigint& b) {
         }
         else {
             // carry stores potential overflow at each digit, sum holds result of sum at each digit
-            short carry = 0, sum;
+            short carry = 0, digit_sum;
             list<short>::iterator i = sum.digits.begin(), j = b.digits.begin();
             for (; i != sum.digits.end() && j != b.digits.end(); ++i, ++j) {
-                sum = *i + *j + carry;
-                if (sum > 9) {  // If sum > 9 --> carry = 1, store sum - 10
-                    *i = sum - 10;
+                digit_sum = *i + *j + carry;
+                if (digit_sum > 9) {  // If sum > 9 --> carry = 1, store sum - 10
+                    *i = digit_sum - 10;
                     carry = 1;
                 }
                 else {   // If sum < 10 --> store sum
-                    *i = sum;
+                    *i = digit_sum;
                     carry = 0;
                 }
             }
             if (i != sum.digits.end() && j == b.digits.end()) {   // If sum has more digits than b, compute                                               // the rest of digits while a carry of 1 exists
                 for (; i != sum.digits.end() && carry == 1; ++i)  {// No need to continue once a carry of 0 occurs
-                    sum = *i + carry;
-                    if (sum > 9) {
-                        *i = sum - 10;
+                    digit_sum = *i + carry;
+                    if (digit_sum > 9) {
+                        *i = digit_sum - 10;
                         carry = 1;
                     }
                     else {
-                        *i = sum;
+                        *i = digit_sum;
                         carry = 0;
                     }
                 }
@@ -256,14 +256,14 @@ void multiply_by_reference(bigint& product, const bigint& rule, short k) {
 // < optimized by assuming comparison to a positive number
 bool bigint::operator < (const bigint& b) const {
     return digits.size() != b.digits.size() ? digits.size() < b.digits.size()
-            : lexicographical_compare(digits.rbegin(), digits.rend(), b.digits.rbegin(), b.digits.rend())
+            : lexicographical_compare(digits.rbegin(), digits.rend(), b.digits.rbegin(), b.digits.rend());
 }
 
 // > optimized by assuming comparison to a positive number
 bool bigint::operator > (const bigint& b) const {
     return digits.back() <= 0 ? false
             : (digits.size() != b.digits.size() ? digits.size() > b.digits.size()
-                : !lexicographical_compare(digits.rbegin(), digits.rend(), b.digits.rbegin(), b.digits.rend());
+                : !lexicographical_compare(digits.rbegin(), digits.rend(), b.digits.rbegin(), b.digits.rend()));
 }
 
 // Div operator. Iteratively reduce A to a small enough number to compute

@@ -1,5 +1,5 @@
 #!/bin/bash
-cd source
+cd ../source
 DIVIDEND=$1
 DIVISOR=$2
 COMPILE=$3
