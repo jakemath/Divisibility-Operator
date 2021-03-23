@@ -1,9 +1,3 @@
- /*
- main.cpp
- Created by Jake Mathai on 2/4/2019.
- Copyright © 2019 Jake Mathai. All rights reserved.
- */
-
 #include "../header/bigint.h"
 
 int main(int argc, char* argv[]) {

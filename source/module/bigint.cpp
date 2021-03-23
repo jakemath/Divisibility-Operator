@@ -1,9 +1,3 @@
-/*
- bigint.cpp
- Created by Jake Mathai on 2/4/2019.
- Copyright © 2019 Jake Mathai. All rights reserved.
- */
-
 #include "../header/bigint.h"
 
 using namespace std;
@@ -41,8 +35,8 @@ void operator + (bigint& sum, bigint& b) {
         else {
             // carry stores potential overflow at each digit, sum holds result of sum at each digit
             short carry = 0, digit_sum;
-            list<short>::iterator i = sum.digits.begin(), j = b.digits.begin();
-            for (; i != sum.digits.end() && j != b.digits.end(); ++i, ++j) {
+            list<short>::iterator i, j;
+            for (i = sum.digits.begin(), j = b.digits.begin(); i != sum.digits.end() && j != b.digits.end(); ++i, ++j) {
                 digit_sum = *i + *j + carry;
                 if (digit_sum > 9) {  // If sum > 9 --> carry = 1, store sum - 10
                     *i = digit_sum - 10;
@@ -81,8 +75,9 @@ void operator - (bigint& difference, bigint& quantity) {
             difference.digits.back() = 0;
         else {
             short diff; // diff holds result of subtraction at each digit
-            list<short>::iterator i = difference.digits.begin(), j = quantity.digits.begin();
-            for (; i != difference.digits.end() && j != quantity.digits.end(); ++i, ++j) {
+            for (list<short>::iterator i = difference.digits.begin(), j = quantity.digits.begin();
+                    i != difference.digits.end() && j != quantity.digits.end();
+                    ++i, ++j) {
                 diff = *i - *j;
                 if (diff < 0) {  // If negative result --> find the first non-zero digit after the current digit
                     list<short>::iterator k = i;   // Iterate from current digit
@@ -207,9 +202,11 @@ void multiply_by_reference(bigint& product, const bigint& rule, short k) {
         product.digits.back() = 0;
     else {
         short prod, carry = 0;
-        list<short>::const_iterator i = rule.digits.begin();
-        list<short>::iterator j = product.digits.begin();
-        for (; i != rule.digits.end() && j != product.digits.end(); ++i, ++j) {
+        list<short>::const_iterator i;
+        list<short>::iterator j;
+        for (i = rule.digits.begin(), j = product.digits.begin();
+                i != rule.digits.end() && j != product.digits.end();
+                ++i, ++j) {
             prod = (*i * k) + carry;
             if (prod > 9) {
                 *j = prod % 10;
@@ -279,7 +276,7 @@ bool div(bigint& dividend, bigint& divisor) {
             return true;
         if (dividend > divisor) {
             for (short i = 2; i <= 9; ++i) {
-                if (dividend == divisor*i)
+                if (dividend == divisor * i)
                     return true;
             }
         }

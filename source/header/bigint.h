@@ -1,9 +1,3 @@
-/*
- bigint.h
- Created by Jake Mathai on 2/4/2019.
- Copyright © 2019 Jake Mathai. All rights reserved.
- */
-
 #ifndef bigint_h
 #define bigint_h
 
